@@ -24,22 +24,19 @@ liaison locale => let x = e in e
 *)
 
 type t_type =
-	| Nombre of int
-	| Boolean of bool
-	| Charactere of char
-	| String of string
+	| Int
 	| Tableau of t_type * t_type
 	| Produit of t_type * t_type
 ;;
 
-type t_expr =
+type expr =
 	| Var of string
 	| Const of int
 	| Op of string
-	| Fun of string * t_type * t_expr
-	| App of t_expr * t_expr
-	| Paire_expr of t_expr * t_expr
-	| Let of string * t_expr * t_expr
+	| Fun of string * t_type * expr
+	| App of expr * expr
+	| Paire of expr * expr
+	| Let of string * expr * expr
 ;;
 
 (* On réalise l'environnement avec une structure persistante en utilisant le module map *)
@@ -54,10 +51,29 @@ type env = t_type Smap.t;;
 Définir une fonction "d’affichage" des expressions mini-ML qui prend une expression et retourne
 l’expression sous la forme d’une chaîne de caractères, écrite de manière habituelle.
 
-Définir quelques exemples d’expressions mini-ML et vérifier leur forme avec la fonctionprécédente. *)
+Définir quelques exemples d’expressions mini-ML et vérifier leur forme avec la fonction précédente. *)
 
+let rec t_expr env = function
+	| Const _ -> Int
+	| Var x -> Smap.find x env
+	| Op "+" -> Tableau (Produit (Int, Int), Int)
+	| Paire (e1, e2) -> Produit (t_expr env e1, t_expr env e2)
+	| Fun (x, ty, e) -> Tableau (ty, t_expr (Smap.add x ty env) e) (* Pour les fonctions, le type de la variable est donnée *)
+	| Let (x, e1, e2) -> t_expr (Smap.add x (t_expr env e1) env) e2 (* Intérêt de l apersistence de env *)
+	| App (e1, e2) -> begin match t_expr env e1 with
+    | Tableau (ty2, ty) ->
+        if t_expr env e2 = ty2
+        then ty
+        else failwith("erreur : argument de mauvais type")
+    | _ ->
+        failwith("erreur : fonction attendue")
+		end
+;;
 
-
+t_expr
+   (Let ("f",
+     Fun ("x", Tint, App (Op "+", Pair (Var "x", Const 1))),
+     App (Var "f", Const 2)));;
 
 
 
