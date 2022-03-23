@@ -16,28 +16,29 @@ type t_type =
 	| Boolean of bool
 	| Charactere of char
 	| String of string
-	| Fonction of (t_type -> t_type)
-	| Paire of t_type * t_type
-	| Nil
 ;;
 
 type t_expr =
-	| Variable of string (* Identificateur (nom de variable) *)
-	| Car of char
+	| Var of string
+	| Const of int
+	| Op of string
+	| Fun of string * t_type * t_expr
 	| App of t_expr * t_expr
 	| Paire_expr of t_expr * t_expr
+	| Let of string * t_expr * t_expr
 ;;
 
-type t_expr = Var  of string                             (* Variables / Identificateur *)
-            | Char of char                               (* Caractère                  *)
-            | Int  of int                                (* Entier                     *)
-            | Bool of bool                               (* Booléen                    *)
-            | Op   of string * t_expr                    (* Opérateur                  *)
-            | Func of string * t_type * t_expr           (* Fonction anonyme           *)
-            | App  of t_expr * t_expr                    (* Application de fonction    *)
-            | Pair of t_expr * t_expr                    (* Tuple                      *)
-            | Let  of string * t_type * t_expr * t_expr  (* Declaration de variable    *)
-;;
+(*
+Les constantes sont celles des types de base (int, bool, unit . . . ).
+Les opérateurs op sont les symboles d’opérations primitives (+,-, etc.).
+
+constante => 1, 2, true...
+primitive => x, +, fst...
+fonction => fun x -> e
+application => e e
+apre => (e, e)
+liaison locale => let x = e in e
+*)
 
 
 (* Q2 : Définir une fonction "d’affichage" des expressions mini-ML qui prend une expression et retourne
