@@ -11,23 +11,6 @@
 (* QUESTION 1 : *)
 (* Définir les types OCaml, pour les types et les expressins du langage mini-ML*)
 
-type t_type =
-	| Nombre of int
-	| Boolean of bool
-	| Charactere of char
-	| String of string
-;;
-
-type t_expr =
-	| Var of string
-	| Const of int
-	| Op of string
-	| Fun of string * t_type * t_expr
-	| App of t_expr * t_expr
-	| Paire_expr of t_expr * t_expr
-	| Let of string * t_expr * t_expr
-;;
-
 (*
 Les constantes sont celles des types de base (int, bool, unit . . . ).
 Les opérateurs op sont les symboles d’opérations primitives (+,-, etc.).
@@ -40,12 +23,47 @@ apre => (e, e)
 liaison locale => let x = e in e
 *)
 
+type t_type =
+	| Nombre of int
+	| Boolean of bool
+	| Charactere of char
+	| String of string
+	| Tableau of t_type * t_type
+	| Produit of t_type * t_type
+;;
 
-(* Q2 : Définir une fonction "d’affichage" des expressions mini-ML qui prend une expression et retourne
-        l’expression sous la forme d’une chaîne de caractères, écrite de manière habituelle.
-        Définir quelques exemples d’expressions mini-ML et vérifier leur forme avec la fonction
-        précédente.
-*)
+type t_expr =
+	| Var of string
+	| Const of int
+	| Op of string
+	| Fun of string * t_type * t_expr
+	| App of t_expr * t_expr
+	| Paire_expr of t_expr * t_expr
+	| Let of string * t_expr * t_expr
+;;
+
+(* On réalise l'environnement avec une structure persistante en utilisant le module map *)
+
+module Smap = Map.Make(String);;
+type env = t_type Smap.t;;
+
+(* Concernant la performence : on a un arbre équilibré. *)
+(* La recherche et l'insertion se font en O(log(n)) *)
+
+(* Question 2 :
+Définir une fonction "d’affichage" des expressions mini-ML qui prend une expression et retourne
+l’expression sous la forme d’une chaîne de caractères, écrite de manière habituelle.
+
+Définir quelques exemples d’expressions mini-ML et vérifier leur forme avec la fonctionprécédente. *)
+
+
+
+
+
+
+
+
+
 
 (* Q3 : Nous allons utiliser les listes d’associations OCaml pour représenter les environnements. Définir
         l’environnements Ep comprenant les constantes et les opérations primitives du langage mini-ML.
