@@ -138,6 +138,7 @@ type environement = (t_expr * t_type) list;;
 (* On initialise notre environnement *)
 let environement_construction =
     (Constante Un, Type Entier)
+    :: (Type Entier * Type Entier)
   ::(Constante Deux, Type Entier)
   ::(Constante Trois, Type Entier)
   ::(Constante Quatre, Type Entier)
@@ -166,7 +167,6 @@ let rec environnement_print environnement =
      environnement_print reste;                                                    
 ;;
 
-
 (*** Question 4 ***)
 
 let rec verif_type environnement expression =
@@ -178,7 +178,7 @@ let rec verif_type environnement expression =
   | Application(exp1, exp2) ->
      begin
        match verif_type environnement exp1, verif_type environnement exp2 with
-       |Fonction(t_local,tbis_local), myType ->
+       |Fonction(t_local, tbis_local), myType ->
          if t_local == myType then tbis_local
          else failwith ("type [" ^ t_type_print t_local ^ "] inexistant")
        |_ -> failwith ("erreur expression -> pas une fonction")
@@ -192,7 +192,10 @@ let rec verif_type environnement expression =
       verif_type env_local exp2
     else failwith ("Erreur type -->" ^ t_type_print t_local)
 ;;
-                                             
+
+
+
+
 (* QUESTION 5 : *)
 
 (* Pour cette question, nous allons formatter
