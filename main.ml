@@ -57,6 +57,34 @@ type t_expr =
 ;;
 
 
+(* QUESTION 2 : *)
+
+let primitive_print primitive =
+	match primitive with
+	| Un -> "Un"
+  | Deux -> "Deux"
+  | Trois -> "Trois"
+  | Quatres -> "Quatres"
+  | Cinq -> "Cinq"
+  | A -> "A"
+  | B -> "B"
+  | C -> "C"
+  | D -> "D"
+  | Vrai -> "Vrai"
+  | Faux -> "Faux"
+  | Plus -> "Plus"
+  | Moins -> "Moins"
+  | Inferieur -> "Inferieur"
+  | Superieur -> "Superieur"
+  | Condition -> "Condition"
+;;
+	
+
+
+
+
+
+
 
 
 
