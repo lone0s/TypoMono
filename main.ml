@@ -115,8 +115,6 @@ let rec t_type_print monType =
 ;;
 
 
-
-(** convert a miniML expression into a printable string *)
 let rec t_expr_print expression =
   match expression with
   | Var var -> var
