@@ -9,6 +9,68 @@
 **********************************************)
 
 (* QUESTION 1 : *)
+
+(* Définition des types de base de miniml *)
+
+type t_typePrimitive =
+	| Entier
+  | Bool
+  | Char
+;;
+
+type t_type =
+	| T of t_typePrimitive
+  | Fonction of t_type * t_type
+  | Tuple of t_type * t_type
+;;
+
+type primitive = 
+  | Un
+  | Deux
+  | Trois
+  | Quatres
+  | Cinq
+  | A
+  | B
+  | C
+  | D
+  | Vrai
+  | Faux
+  | Plus
+  | Moins
+  | Inferieur
+  | Superieur
+  | Condition
+;;
+
+(* Défini le nom d'une variable ou d'une fonction *)
+type name = string;;
+
+
+type t_expr =
+  | Var of name
+  | Constante of primitive
+  | Fonction of name * t_type * t_expr
+  | Application of t_expr * t_expr
+  | Tuple of t_expr * t_expr
+  | Let of name * t_type * t_expr * t_expr
+;;
+
+
+
+
+
+
+
+
+
+
+
+
+(* CE QUE J'AVAIS FAIT *)
+
+
+(* QUESTION 1 : *)
 (* Définir les types OCaml, pour les types et les expressins du langage mini-ML*)
 
 (*
