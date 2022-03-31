@@ -11,7 +11,6 @@
 (* QUESTION 1 : *)
 
 (* Définition des types de base de miniml *)
-
 open List
 
 type t_typePrimitive =
@@ -150,11 +149,11 @@ let environement_construction =
   ::(Constante D, Type Char)
   ::(Constante Vrai, Type Bool)
   ::(Constante Faux, Type Bool)
-  ::(Constante Plus, Fonction(TupleT(Type Entier, Type Entier), Type Entier))
-  ::(Constante Moins, Fonction(TupleT(Type Entier, Type Entier), Type Entier))
-  ::(Constante Inferieur, Fonction(TupleT(Type Entier, Type Entier), Type Bool))
-  ::(Constante Superieur, Fonction(TupleT(Type Entier, Type Entier), Type Bool))
-  ::(Constante Condition, Fonction(TupleT(Type Bool, TupleT(Type Entier, Type Entier)), T Entier))
+  ::(Constante Plus, Fonction(Tuple(Type Entier, Type Entier), Type Entier))
+  ::(Constante Moins, Fonction(Tuple(Type Entier, Type Entier), Type Entier))
+  ::(Constante Inferieur, Fonction(Tuple(Type Entier, Type Entier), Type Bool))
+  ::(Constante Superieur, Fonction(Tuple(Type Entier, Type Entier), Type Bool))
+  ::(Constante Condition, Fonction(Tuple(Type Bool, Tuple(Type Entier, Type Entier)), Type Entier))
   ::[]
 ;;
 
@@ -172,24 +171,20 @@ let rec environnement_print environnement =
 
 let rec verif_type environnement expression =
   match expression with
-  | Var valeur -> match (List.assoc_opt (Var valeur) environnement) with
-                  |None -> failwith ("Variable [" ^ valeur ^ "] inexistante dans l'environnement")
-                  |Some(v) -> v
-  | Constante cte  -> match (List.assoc_opt (Constante cte) environnement) with
-                  |None -> failwith ("Variable [" ^ valeur ^ "] inexistante dans l'environnement")
-                  |Some(c) -> c
-  | F_local(v_local, t_local, exp_local) -> let env_local = (Var v_local, t_local)::environnement in
-                                            Fbis_local(t_local, verif_type env_local exp_local)
-  | A_local(exp1, exp2) ->
+  | Var valeur -> List.assoc (Var valeur) environnement
+  | Constante cte  -> List.assoc (Constante cte) environnement
+  | Fonction(v_local, t_local, exp_local) -> let env_local = (Var v_local, t_local)::environnement in
+                                            Fonction(t_local, verif_type env_local exp_local)
+  | Application(exp1, exp2) ->
      begin
        match verif_type environnement exp1, verif_type environnement exp2 with
-       |F2_local(t_local,tbis_local), myType ->
-         if t_local == myType then t2
-         else failwith ("type [" ^ t_type_print t1 ^ "] inexistant")
+       |Fonction(t_local,tbis_local), myType ->
+         if t_local == myType then tbis_local
+         else failwith ("type [" ^ t_type_print t_local ^ "] inexistant")
        |_ -> failwith ("erreur expression -> pas une fonction")
      end
 
-  |Tuple (exp1, exp2) -> myTuple(verif_type environnement exp1, verif_type environnement exp2)
+  |Tuple (exp1, exp2) -> Tuple(verif_type environnement exp1, verif_type environnement exp2)
   |Let (v_local, t_local, exp1, exp2) ->
     if t_local == verif_type environnement exp1
     then
