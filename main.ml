@@ -129,6 +129,12 @@ let rec t_expr_print expression =
      "let " ^ nom ^ " : " ^ t_type_print type1 ^ " = " ^ t_expr_print expression1 ^ " in " ^ t_expr_print expression2
 ;;
 
+let expression = Let("decrement", Fonction(Type Entier, Type Entier),
+	Fonction("x", Type Entier, Application(Constante Moins, Tuple(Var "x", Constante Un))),
+	Tuple(Application(Var "decrement", Constante Un), Var "x"));;
+
+t_expr_print(expression);;
+
 
 (* Question 3 *)
 
