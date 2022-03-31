@@ -175,6 +175,12 @@ let rec environnement_print environnement =
 
 (*** Question 4 ***)
 
+(* Nous avons rencontrés des difficultés pour coder cette fonction,
+		en particulier lors des essaies de la question 5,
+		on obtiens : Exception: Failure "type [Entier * Entier] inexistant".
+		
+		Malgré nos efforts, nous n'avons pas su résoudre le(s) problème(s)
+*)
 let rec verif_type environnement expression =
   match expression with
   | Var valeur -> List.assoc (Var valeur) environnement
