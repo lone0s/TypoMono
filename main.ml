@@ -19,7 +19,7 @@ type t_typePrimitive =
 ;;
 
 type t_type =
-	| T of t_typePrimitive
+	| Type of t_typePrimitive
   | Fonction of t_type * t_type
   | Tuple of t_type * t_type
 ;;
@@ -28,7 +28,7 @@ type primitive =
   | Un
   | Deux
   | Trois
-  | Quatres
+  | Quatre
   | Cinq
   | A
   | B
@@ -71,7 +71,7 @@ let primitive_print primitive =
 	| Un -> "Un"
   | Deux -> "Deux"
   | Trois -> "Trois"
-  | Quatres -> "Quatres"
+  | Quatre -> "Quatre"
   | Cinq -> "Cinq"
   | A -> "A"
   | B -> "B"
@@ -90,7 +90,7 @@ let primitive_print primitive =
           
 let rec t_type_print monType =
   match monType with
-  | T type1 -> t_typePrimitive_print type1
+  | Type type1 -> t_typePrimitive_print type1
   | Fonction(type1, type2) -> (
   	t_type_print type1 ^ " -> " ^ t_type_print type2
   	)
@@ -127,6 +127,46 @@ let rec t_expr_print expression =
   | Let(nom, type1, expression1, expression2) ->
      "let " ^ nom ^ " : " ^ t_type_print type1 ^ " = " ^ t_expr_print expression1 ^ " in " ^ t_expr_print expression2
 ;;
+
+
+
+(* Question 3 *)
+
+(* On créer notre environnement *)
+type environement = (t_expr * t_type) list;;
+
+(* On initialise notre environnement *)
+let environement_construction =
+    (Constante Un, Type Entier)
+  ::(Constante Deux, Type Entier)
+  ::(Constante Trois, Type Entier)
+  ::(Constante Quatre, Type Entier)
+  ::(Constante Cinq, Type Entier)
+  ::(Constante A, Type Char)
+  ::(Constante B, Type Char)
+  ::(Constante C, Type Char)
+  ::(Constante D, Type Char)
+  ::(Constante Vrai, Type Bool)
+  ::(Constante Faux, Type Bool)
+  ::(Constante Plus, Fonction(TupleT(Type Entier, Type Entier), Type Entier))
+  ::(Constante Moins, Fonction(TupleT(Type Entier, Type Entier), Type Entier))
+  ::(Constante Inferieur, Fonction(TupleT(Type Entier, Type Entier), Type Bool))
+  ::(Constante Superieur, Fonction(TupleT(Type Entier, Type Entier), Type Bool))
+  ::(Constante Condition, Fonction(TupleT(Type Bool, TupleT(Type Entier, Type Entier)), T Entier))
+  ::[]
+;;
+
+let rec environnement_print environnement =
+  match environnement with
+  | [] -> ()
+  | tete::reste ->
+     print_string (t_expr_print (fst tete) ^ " : " ^ (t_type_print (snd tete)));
+     print_newline();
+     environnement_print reste;                                                    
+;;
+
+
+
 
 
 
