@@ -59,6 +59,13 @@ type t_expr =
 
 (* QUESTION 2 : *)
 
+let t_typePrimitive_print monType =
+	match monType with
+	| Entier -> "Entier"
+  | Bool -> "Bool"
+  | Char -> "Char"
+;;
+
 let primitive_print primitive =
 	match primitive with
 	| Un -> "Un"
@@ -78,16 +85,50 @@ let primitive_print primitive =
   | Superieur -> "Superieur"
   | Condition -> "Condition"
 ;;
-	
+
+
+          
+let rec t_type_print monType =
+  match monType with
+  | T type1 -> t_typePrimitive_print type1
+  | Fonction(type1, type2) -> (
+  	t_type_print type1 ^ " -> " ^ t_type_print type2
+  	)
+  | Tuple(type1, type2) ->
+  	
+  	(* L'ordre du filtrage est très important afin de ne pas rentré
+  			directement dans le cas de base *)
+  	match type1, type2 with
+     (* Double tuple => (type * type) * (type * type) *)
+     | Tuple(_, _), Tuple(_, _) ->  (
+     		"(" ^ t_type_print type1 ^ ") * (" ^ t_type_print type2 ^ ")"
+     	)
+     
+     (* Le tuple est uniquement à gauche => (type * type) * type			*)
+     | Tuple(_, _), _ ->  "(" ^ t_type_print type1 ^ ") * " ^ t_type_print type2
+     
+     (* Le tuple est uniquement à droite => type * (type * type)			*)
+     | _, Tuple(_, _) ->  t_type_print type1 ^ " * (" ^ t_type_print type2 ^ ")"
+     	
+     (* Cas de base, un tuple simple => type * type										*)
+     | _, _ ->  t_type_print type1 ^ " * " ^ t_type_print type2
+;;
 
 
 
-
-
-
-
-
-
+(** convert a miniML expression into a printable string *)
+let rec t_expr_print expression =
+  match expression with
+  | Var var -> var
+  | Constante constante -> primitive_print constante
+  | Fonction(name, type1, expression) -> (
+  		"fun " ^ name ^ " : " ^ t_type_print type1 ^ " -> " ^ t_expr_print expression
+  	)
+  | Application(expression1, expression2) -> t_expr_print expression1 ^ " " ^ t_expr_print expression2
+  | Tuple(expression1, expression2) -> "(" ^ t_expr_print expression1 ^ ", " ^ t_expr_print expression2 ^ ")"
+  | Let(nom, type1, expression1, expression2) ->
+     "let " ^ nom ^ " : " ^ t_type_print type1 ^ " = " ^ t_expr_print expression1 ^ " in " ^ t_expr_print expression2
+;;
 
 
 
