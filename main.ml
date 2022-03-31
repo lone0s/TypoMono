@@ -10,7 +10,8 @@
 
 (* QUESTION 1 : *)
 
-(* Définition des types de base de miniml *)
+(* Définition des types de base de mini-ML *)
+
 open List
 
 type t_typePrimitive =
@@ -25,6 +26,7 @@ type t_type =
   | Tuple of t_type * t_type
 ;;
 
+(* Constantes et opérations *)
 type primitive = 
   | Un
   | Deux
@@ -86,8 +88,6 @@ let primitive_print primitive =
   | Superieur -> "Superieur"
   | Condition -> "Condition"
 ;;
-
-
           
 let rec t_type_print monType =
   match monType with
@@ -130,7 +130,6 @@ let rec t_expr_print expression =
 ;;
 
 
-
 (* Question 3 *)
 
 (* On créer notre environnement *)
@@ -157,6 +156,7 @@ let environement_construction =
   ::[]
 ;;
 
+(* Affichage de l'environnement *)
 let rec environnement_print environnement =
   match environnement with
   | [] -> ()
@@ -191,108 +191,47 @@ let rec verif_type environnement expression =
       let env_local = (Var v_local, t_local)::environnement in
       verif_type env_local exp2
     else failwith ("Erreur type -->" ^ t_type_print t_local)
-   ;;
+;;
                                              
-                                             
-     
-                            
-                            
+(* QUESTION 5 : *)
 
-
-
-
-
-
-(* CE QUE J'AVAIS FAIT *)
-
-
-(* QUESTION 1 : *)
-(* Définir les types OCaml, pour les types et les expressins du langage mini-ML*)
-
-(*
-Les constantes sont celles des types de base (int, bool, unit . . . ).
-Les opérateurs op sont les symboles d’opérations primitives (+,-, etc.).
-
-constante => 1, 2, true...
-primitive => x, +, fst...
-fonction => fun x -> e
-application => e e
-apre => (e, e)
-liaison locale => let x = e in e
+(* Pour cette question, nous allons formatter
+		l'expression à l'aide de sous-expressions
+		afin de faciliter la lecture
+		
+		On rappelle qu'on veut obtenir l'expression :
+		
+		fun x : char -> (let succ : int -> int = fun x : int -> + (x, 1) in (succ 1, x))
 *)
 
-type t_type =
-	| Int
-	| Tableau of t_type * t_type
-	| Produit of t_type * t_type
-;;
+let expr_aux1 = Application(Constante Plus, Tuple(Var "x", Constante Un));;
+let fonc_aux1 = Fonction("x", Type Entier, expr_aux1);;
+let tuple_aux1 = Tuple(Application(Var "succ", Constante Un), Var "x");;
+let let_aux1 = Let("succ", Fonction(Type Entier, Type Entier), fonc_aux1, tuple_aux1);;
+let expression1 = Fonction("x", Type Char, let_aux1);;
 
-type expr =
-	| Var of string
-	| Const of int
-	| Op of string
-	| Fun of string * t_type * expr
-	| App of expr * expr
-	| Paire of expr * expr
-	| Let of string * expr * expr
-;;
+(* On affiche l'expression *)
+t_expr_print expression1;;
 
-(* On réalise l'environnement avec une structure persistante en utilisant le module map *)
-
-module Smap = Map.Make(String);;
-type env = t_type Smap.t;;
-
-(* Concernant la performence : on a un arbre équilibré. *)
-(* La recherche et l'insertion se font en O(log(n)) *)
-
-(* Question 2 :
-Définir une fonction "d’affichage" des expressions mini-ML qui prend une expression et retourne
-l’expression sous la forme d’une chaîne de caractères, écrite de manière habituelle.
-
-Définir quelques exemples d’expressions mini-ML et vérifier leur forme avec la fonction précédente. *)
-
-let rec t_expr env = function
-	| Const _ -> Int
-	| Var x -> Smap.find x env
-	| Op "+" -> Tableau (Produit (Int, Int), Int)
-	| Paire (e1, e2) -> Produit (t_expr env e1, t_expr env e2)
-	| Fun (x, ty, e) -> Tableau (ty, t_expr (Smap.add x ty env) e) (* Pour les fonctions, le type de la variable est donnée *)
-	| Let (x, e1, e2) -> t_expr (Smap.add x (t_expr env e1) env) e2 (* Intérêt de l apersistence de env *)
-	| App (e1, e2) -> begin match t_expr env e1 with
-    | Tableau (ty2, ty) ->
-        if t_expr env e2 = ty2
-        then ty
-        else failwith("erreur : argument de mauvais type")
-    | _ ->
-        failwith("erreur : fonction attendue")
-		end
-;;
-
-t_expr
-   (Let ("f",
-     Fun ("x", Tint, App (Op "+", Pair (Var "x", Const 1))),
-     App (Var "f", Const 2)));;
+(* On vérifi son type *)
+verif_type environement_construction expression1;;
 
 
 
+(* Pour la deuxième expression, on souhaite obtenir :
 
+fun x : char -> (let succ : int -> int = fun y : int -> + (y, 1) in (succ 1, x))
 
-
-
-(* Q3 : Nous allons utiliser les listes d’associations OCaml pour représenter les environnements. Définir
-        l’environnements Ep comprenant les constantes et les opérations primitives du langage mini-ML.
 *)
 
+let expr_aux2 = Application(Constante Plus, Tuple(Var "y", Constante Un));;
+let fonc_aux2 = Fonction("y", Type Entier, expr_aux2);;
+let tuple_aux2 = Tuple(Application(Var "succ", Constante Un), Var "x");;
+let let_aux2 = Let("succ", Fonction(Type Entier, Type Entier), fonc_aux2, tuple_aux2);;
+let expression2 = Fonction("x", Type Char, let_aux2);;
 
-(* Q4 : Définir une fonction de vérification de type, qui prend en argument un environnement et une
-        expression mini-ML et retourne le type de l’expression si l’expression est bien typée et lève une
-        erreur sinon. Cette fonction mettra en oeuvre les règles d’inférence monomorphe.
-*)
+(* On affiche l'expression *)
+t_expr_print expression2;;
 
-(* Q5 : Utiliser la fonction de vérification de type de la question 4 pour calculer le type des expressions
-        mini-ML typé suivantes :
-        fun x : char -> (let succ : int -> int = fun x : int -> + (x, 1) in (succ 1, x))
-        fun x : char -> (let succ : int -> int = fun y : int -> + (y, 1) in (succ 1, x))
-        Ont-elles le même type ? Sinon, modifier la fonction précédente pour prendre en compte les
-        variables homonymes.
-*)
+(* On vérifi son type *)
+verif_type environement_construction expression2;;
