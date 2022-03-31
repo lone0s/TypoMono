@@ -12,6 +12,8 @@
 
 (* Définition des types de base de miniml *)
 
+open List
+
 type t_typePrimitive =
 	| Entier
   | Bool
@@ -166,8 +168,40 @@ let rec environnement_print environnement =
 ;;
 
 
+(*** Question 4 ***)
 
+let rec verif_type environnement expression =
+  match expression with
+  | Var valeur -> match (List.assoc_opt (Var valeur) environnement) with
+                  |None -> failwith ("Variable [" ^ valeur ^ "] inexistante dans l'environnement")
+                  |Some(v) -> v
+  | Constante cte  -> match (List.assoc_opt (Constante cte) environnement) with
+                  |None -> failwith ("Variable [" ^ valeur ^ "] inexistante dans l'environnement")
+                  |Some(c) -> c
+  | F_local(v_local, t_local, exp_local) -> let env_local = (Var v_local, t_local)::environnement in
+                                            Fbis_local(t_local, verif_type env_local exp_local)
+  | A_local(exp1, exp2) ->
+     begin
+       match verif_type environnement exp1, verif_type environnement exp2 with
+       |F2_local(t_local,tbis_local), myType ->
+         if t_local == myType then t2
+         else failwith ("type [" ^ t_type_print t1 ^ "] inexistant")
+       |_ -> failwith ("erreur expression -> pas une fonction")
+     end
 
+  |Tuple (exp1, exp2) -> myTuple(verif_type environnement exp1, verif_type environnement exp2)
+  |Let (v_local, t_local, exp1, exp2) ->
+    if t_local == verif_type environnement exp1
+    then
+      let env_local = (Var v_local, t_local)::environnement in
+      verif_type env_local exp2
+    else failwith ("Erreur type -->" ^ t_type_print t_local)
+   ;;
+                                             
+                                             
+     
+                            
+                            
 
 
 
